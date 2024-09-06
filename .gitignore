@@ -46,9 +46,6 @@ obj/
 *.temp
 *.log
 
-# Arquivos de configuração de desenvolvimento
-launchSettings.json
-
 # Diretórios e arquivos de cache de dependências
 npm-debug.log
 yarn-debug.log
