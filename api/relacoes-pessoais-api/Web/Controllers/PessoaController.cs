@@ -28,11 +28,12 @@ namespace relacoes_pessoais_api.Web.Controllers
         }
 
         [HttpGet("obter-lista-pessoas")]
-        public async Task<ActionResult> ObterDadosSrt([FromServices] PessoaService service)
+        public async Task<ActionResult> ObterListaAsync([FromServices] PessoaService service, [FromQuery] string? nome, [FromQuery] int page)
         {
             try
             {
-                return Ok(await service.ObterListaAsync());
+                var (lista, total )= await service.ObterListaAsync(nome, page-1);
+                return Ok(new {lista, total});
             }
             catch (Exception e)
             {
@@ -41,11 +42,11 @@ namespace relacoes_pessoais_api.Web.Controllers
         }
 
         [HttpPost("incluir-pessoa")]
-        public async Task<ActionResult> IncluirPessoaAsync([FromServices] PessoaService service, [FromBody] PessoaDto model)
+        public async Task<ActionResult> IncluirPessoaAsync([FromServices] PessoaService service, [FromBody] PessoaDto model, CancellationToken ct)
         {
             try
             {
-                var response = await service.AdicionarPessoaAsync(model);
+                var response = await service.AdicionarPessoaAsync(model, ct);
 
                 return Ok(response);
             }
@@ -56,11 +57,11 @@ namespace relacoes_pessoais_api.Web.Controllers
         }
 
         [HttpPut("editar-pessoa")]
-        public async Task<ActionResult> EditarPessoaAsync([FromServices] PessoaService service, [FromBody] PessoaDto model)
+        public async Task<ActionResult> EditarPessoaAsync([FromServices] PessoaService service, [FromBody] PessoaDto model, CancellationToken ct)
         {
             try
             {
-                var response = await service.EditarPessoaAsync(model);
+                var response = await service.EditarPessoaAsync(model, ct);
 
                 return Ok(response);
             }
@@ -71,11 +72,11 @@ namespace relacoes_pessoais_api.Web.Controllers
         }
 
         [HttpDelete("excluir-pessoa")]
-        public async Task<ActionResult> ExcluirPessoaAsync([FromServices] PessoaService service, [FromQuery] int codPessoa)
+        public async Task<ActionResult> ExcluirPessoaAsync([FromServices] PessoaService service, [FromQuery] int codPessoa, CancellationToken ct)
         {
             try
             {
-                var (excluido, mensagem) = await service.ExcluirPessoaAsync(codPessoa);
+                var (excluido, mensagem) = await service.ExcluirPessoaAsync(codPessoa, ct);
 
                 if (!excluido)
                     return BadRequest(mensagem);

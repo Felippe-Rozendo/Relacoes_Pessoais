@@ -11,11 +11,11 @@ namespace relacoes_pessoais_api.Web.Controllers
     {
 
         [HttpPost("incluir-contato")]
-        public async Task<ActionResult> IncluirContatoAsync([FromServices] ContatoService service, [FromBody] IList<ContatoDto> model)
+        public async Task<ActionResult> IncluirContatoAsync([FromServices] ContatoService service, [FromBody] IList<ContatoDto> model, CancellationToken ct)
         {
             try
             {
-                var response = await service.AdicionarContatoAsync(model);
+                var response = await service.AdicionarContatoAsync(model, ct);
 
                 return Ok(model);
             }
@@ -26,11 +26,11 @@ namespace relacoes_pessoais_api.Web.Controllers
         }
 
         [HttpPut("editar-contato")]
-        public async Task<ActionResult> EditarContatoAsync([FromServices] ContatoService service, [FromBody] IList<ContatoDto> model)
+        public async Task<ActionResult> EditarContatoAsync([FromServices] ContatoService service, [FromBody] IList<ContatoDto> model, CancellationToken ct)
         {
             try
             {
-                var response = await service.EditarContatoAsync(model);
+                var response = await service.EditarContatoAsync(model, ct);
 
                 return Ok(model);
             }
@@ -41,11 +41,11 @@ namespace relacoes_pessoais_api.Web.Controllers
         }
 
         [HttpDelete("excluir-contato")]
-        public async Task<ActionResult> ExcluirRegistroContatoAsync([FromServices] ContatoService service, [FromQuery] int codContato)
+        public async Task<ActionResult> ExcluirRegistroContatoAsync([FromServices] ContatoService service, [FromQuery] int codContato, CancellationToken ct)
         {
             try
             {
-                var (excluido, mensagem) = await service.ExcluirContatoAsync(codContato);
+                var (excluido, mensagem) = await service.ExcluirContatoAsync(codContato,ct);
 
                 if (!excluido)
                     return BadRequest(mensagem);

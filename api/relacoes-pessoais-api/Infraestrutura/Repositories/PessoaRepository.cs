@@ -7,7 +7,9 @@ using relacoes_pessoais_api.Dominio.Enums;
 using relacoes_pessoais_api.Dominio.Extensions;
 using relacoes_pessoais_api.Dominio.IRepositories;
 using relacoes_pessoais_api.Infraestrutura.Context;
+using System.Drawing;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace relacoes_pessoais_api.Infraestrutura.Repositories
 {
@@ -20,26 +22,33 @@ namespace relacoes_pessoais_api.Infraestrutura.Repositories
             _db = db;
         }
 
-        public async Task<IList<PessoaDto>> ObterListaAsync()
+        public async Task<(IList<PessoaDto>, int totalLista)> ObterListaAsync(string nome, int page)
         {
-            var result = await (from pessoa in _db.Pessoas
-                                join contato in _db.Contatos
-                                on pessoa.CodPessoa equals contato.CodPessoa into pessoaContatos
-                                select new PessoaDto
-                                {
-                                    CodPessoa = pessoa.CodPessoa,
-                                    Nome = pessoa.Nome,
-                                    DataModificacao = pessoa.DataModificacao,
-                                    Contatos = pessoaContatos.Select(c => new ContatoDto
-                                    {
-                                        CodPessoa = c.CodPessoa,
-                                        CodContato = c.CodContato,
-                                        TipoContato = c.TipoContato,
-                                        TipoContatoDsc = EnumExtensions.GetDescription<TipoContatoEnum>(c.TipoContato),
-                                        ValorContato = c.ValorContato
-                                    }).ToList()
-                                }).ToListAsync();
-            return result;
+            var query = from pessoa in _db.Pessoas
+                        join contato in _db.Contatos
+                        on pessoa.CodPessoa equals contato.CodPessoa into pessoaContatos
+                        orderby pessoa.DataModificacao descending
+                        select new PessoaDto
+                        {
+                            CodPessoa = pessoa.CodPessoa,
+                            Nome = pessoa.Nome,
+                            DataModificacao = pessoa.DataModificacao,
+                            ContatosDsc = string.Join(" | ", pessoaContatos.Select(c => $"{EnumExtensions.GetDescription<TipoContatoEnum>(c.TipoContato)}: {c.ValorContato}"))
+                        };
+
+
+            if (!string.IsNullOrWhiteSpace(nome))
+            {
+                query = query.Where(p => p.Nome.Trim().Contains(nome.Trim()));
+            }
+
+            var totalLista = await query.CountAsync();
+
+            var lista = await query
+            .Skip(page * 9).Take(9)
+                .ToListAsync();
+
+            return (lista, totalLista);
         }
 
 
@@ -68,19 +77,19 @@ namespace relacoes_pessoais_api.Infraestrutura.Repositories
         }
 
 
-        public async Task<Pessoa> AdicionarPessoaAsync(PessoaDto model)
+        public async Task<Pessoa> AdicionarPessoaAsync(PessoaDto model, CancellationToken ct)
         {
             var pessoa = new Pessoa();
 
             pessoa.Nome = model.Nome;
             pessoa.DataModificacao = DateTime.Now;
 
-            await _db.Pessoas.AddAsync(pessoa);
-            await _db.SaveChangesAsync();
+            await _db.Pessoas.AddAsync(pessoa, ct);
+            await _db.SaveChangesAsync(ct);
             return pessoa;
         }
 
-        public async Task<Pessoa> EditarPessoaAsync(PessoaDto model)
+        public async Task<Pessoa> EditarPessoaAsync(PessoaDto model, CancellationToken ct)
         {
             var pessoa = await _db.Pessoas.FirstAsync(x => x.CodPessoa == model.CodPessoa);
 
@@ -91,11 +100,11 @@ namespace relacoes_pessoais_api.Infraestrutura.Repositories
             pessoa.DataModificacao = DateTime.Now;
 
             _db.Pessoas.Update(pessoa);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
             return pessoa;
         }
 
-        public async Task<(bool excluido, string? mensagem)> RemoverPessoaAsync(int codPessoa)
+        public async Task<(bool excluido, string? mensagem)> RemoverPessoaAsync(int codPessoa, CancellationToken ct)
         {
             try
             {
@@ -105,7 +114,7 @@ namespace relacoes_pessoais_api.Infraestrutura.Repositories
                     return (false, "Pessoa não encontrada.");
 
                 _db.Pessoas.Remove(pessoa);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(ct);
                 return (true, "Pessoa excluída com sucesso.");
             }
             catch (Exception e)

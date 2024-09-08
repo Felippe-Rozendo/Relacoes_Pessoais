@@ -14,14 +14,14 @@ namespace relacoes_pessoais_api.Aplicacao.Service
             _contatoRepository = contatoRepository;
         }
 
-        public async Task<IList<Contato>> AdicionarContatoAsync(IList<ContatoDto> contatos)
+        public async Task<IList<Contato>> AdicionarContatoAsync(IList<ContatoDto> contatos, CancellationToken ct)
         {
             try
             {
                 var (ehValido, mensagem) = ValidarContato(contatos);
                 
                 if (ehValido)
-                    return await _contatoRepository.AdicionarContatoAsync(contatos);
+                    return await _contatoRepository.AdicionarContatoAsync(contatos, ct);
                 
                 throw new Exception(mensagem);
             }
@@ -31,11 +31,15 @@ namespace relacoes_pessoais_api.Aplicacao.Service
             }
         }
 
-        public async Task<IList<ContatoDto>> EditarContatoAsync(IList<ContatoDto> dto)
+        public async Task<IList<ContatoDto>> EditarContatoAsync(IList<ContatoDto> dto, CancellationToken ct)
         {
             try
             {
-                return await _contatoRepository.EditarContatoAsync(dto);
+                var (ehValido, mensagem) = ValidarContato(dto);
+
+                if (ehValido)
+                    return await _contatoRepository.EditarContatoAsync(dto, ct);
+                throw new Exception(mensagem);
             }
             catch (Exception ex)
             {
@@ -43,11 +47,11 @@ namespace relacoes_pessoais_api.Aplicacao.Service
             }
         }
 
-        public async Task<(bool excluido, string? mensagem)> ExcluirContatoAsync(int codContato)
+        public async Task<(bool excluido, string? mensagem)> ExcluirContatoAsync(int codContato, CancellationToken ct)
         {
             try
             {
-                return await _contatoRepository.RemoverContatoAsync(codContato);
+                return await _contatoRepository.RemoverContatoAsync(codContato, ct);
             }
             catch (Exception ex)
             {

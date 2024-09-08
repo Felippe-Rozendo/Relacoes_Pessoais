@@ -15,7 +15,7 @@ namespace relacoes_pessoais_api.Infraestrutura.Repositories
             _db = db;
         }
 
-        public async Task<IList<Contato>> AdicionarContatoAsync(IList<ContatoDto> contatos)
+        public async Task<IList<Contato>> AdicionarContatoAsync(IList<ContatoDto> contatos, CancellationToken ct)
         {
             var contatoList = new List<Contato>();
 
@@ -30,12 +30,12 @@ namespace relacoes_pessoais_api.Infraestrutura.Repositories
                 contatoList.Add(contato);
             }
 
-            await _db.Contatos.AddRangeAsync(contatoList);
-            await _db.SaveChangesAsync();
+            await _db.Contatos.AddRangeAsync(contatoList, ct);
+            await _db.SaveChangesAsync(ct);
             return contatoList;
         }
 
-        public async Task<IList<ContatoDto>> EditarContatoAsync(IList<ContatoDto> contatos)
+        public async Task<IList<ContatoDto>> EditarContatoAsync(IList<ContatoDto> contatos, CancellationToken ct)
         {
             var novosContatos = new List<Contato>();
 
@@ -67,15 +67,15 @@ namespace relacoes_pessoais_api.Infraestrutura.Repositories
             }
 
             if (novosContatos.Any())
-                await _db.Contatos.AddRangeAsync(novosContatos);
+                await _db.Contatos.AddRangeAsync(novosContatos, ct);
 
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
 
             return contatos;
         }
 
 
-        public async Task<(bool excluido, string? mensagem)> RemoverContatoAsync(int codContato)
+        public async Task<(bool excluido, string? mensagem)> RemoverContatoAsync(int codContato, CancellationToken ct)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace relacoes_pessoais_api.Infraestrutura.Repositories
                     return (false, "Contato não encontrado.");
 
                 _db.Contatos.Remove(contato);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(ct);
                 return (true, "Contato excluído com sucesso.");
             }
             catch (Exception e)

@@ -10,7 +10,7 @@ namespace relacoes_pessoais_api.Dominio.Enums
         [Description("E-mail")]
         Email = 2,
 
-        [Description("Outro")]
+        [Description("Whatsapp")]
         Outro = 3
     }
 }

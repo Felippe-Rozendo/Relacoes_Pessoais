@@ -7,9 +7,9 @@ namespace relacoes_pessoais_api.Dominio.IRepositories
     public interface IPessoaRepository
     {
         public Task<PessoaDto?> ObterPessoaAsync(int codPessoa);
-        public Task<IList<PessoaDto>> ObterListaAsync();
-        public Task<Pessoa> AdicionarPessoaAsync(PessoaDto model);
-        public Task<Pessoa> EditarPessoaAsync(PessoaDto model);
-        public Task<(bool excluido, string? mensagem)> RemoverPessoaAsync(int codPessoa);
+        public Task<(IList<PessoaDto>, int totalLista)> ObterListaAsync(string nome, int page);
+        public Task<Pessoa> AdicionarPessoaAsync(PessoaDto model, CancellationToken ct);
+        public Task<Pessoa> EditarPessoaAsync(PessoaDto model, CancellationToken ct);
+        public Task<(bool excluido, string? mensagem)> RemoverPessoaAsync(int codPessoa, CancellationToken ct);
     }
 }

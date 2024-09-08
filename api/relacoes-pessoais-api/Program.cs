@@ -14,6 +14,17 @@ namespace relacoes_pessoais_api
             builder.Services.AddDbContext<RelacoesPessoaisDB>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+            });
+
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -30,6 +41,7 @@ namespace relacoes_pessoais_api
 
             app.UseAuthorization();
 
+            app.UseCors("AllowAll");
 
             app.MapControllers();
 

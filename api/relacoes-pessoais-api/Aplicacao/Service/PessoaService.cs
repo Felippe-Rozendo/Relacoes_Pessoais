@@ -28,11 +28,11 @@ namespace relacoes_pessoais_api.Aplicacao.Service
             }
         }
 
-        public async Task<IList<PessoaDto>> ObterListaAsync()
+        public async Task<(IList<PessoaDto>, int totalLista)> ObterListaAsync(string nome, int page)
         {
             try
             {
-                return await _pessoaRepository.ObterListaAsync();
+                return await _pessoaRepository.ObterListaAsync(nome, page);
             }
             catch (Exception ex)
             {
@@ -40,11 +40,11 @@ namespace relacoes_pessoais_api.Aplicacao.Service
             }
         }
 
-        public async Task<Pessoa> AdicionarPessoaAsync(PessoaDto dto)
+        public async Task<Pessoa> AdicionarPessoaAsync(PessoaDto dto, CancellationToken ct)
         {
             try
             {
-                return await _pessoaRepository.AdicionarPessoaAsync(dto);
+                return await _pessoaRepository.AdicionarPessoaAsync(dto, ct);
             }
             catch (Exception ex)
             {
@@ -52,11 +52,11 @@ namespace relacoes_pessoais_api.Aplicacao.Service
             }
         }
 
-        public async Task<Pessoa> EditarPessoaAsync(PessoaDto dto)
+        public async Task<Pessoa> EditarPessoaAsync(PessoaDto dto, CancellationToken ct)
         {
             try
             {
-                return await _pessoaRepository.EditarPessoaAsync(dto);
+                return await _pessoaRepository.EditarPessoaAsync(dto, ct);
             }
             catch (Exception ex)
             {
@@ -64,11 +64,11 @@ namespace relacoes_pessoais_api.Aplicacao.Service
             }
         }
 
-        public async Task<(bool excluido, string? mensagem)> ExcluirPessoaAsync(int codPessoa)
+        public async Task<(bool excluido, string? mensagem)> ExcluirPessoaAsync(int codPessoa, CancellationToken ct)
         {
             try
             {
-                return await _pessoaRepository.RemoverPessoaAsync(codPessoa);
+                return await _pessoaRepository.RemoverPessoaAsync(codPessoa, ct);
             }
             catch (Exception ex)
             {

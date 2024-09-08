@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../imgs/address-book-regular.svg" type="image/svg+xml">
+    <title>Relações Pessoais</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main>
+        <div class="top-bar">
+            <img src="../../imgs/address-book-regular.svg" alt="Descrição da imagem">
+            <h4 class="titulo-pagina">Relações Pessoais</h4>
+
+            <div class="search d-flex ml-auto">
+                <div class="search-container">
+                    <img src="../../imgs/magnifying-glass-solid.svg" alt="Buscar" class="search-icon">
+                    <input type="text" placeholder="Buscar pessoa..." class="search-input" id="search-input" onkeydown="if(event.key === 'Enter') obterListaPessoas()">
+                </div>
+            </div>
+
+            <div class="d-flex">
+                <button class="btn-custom" onclick="obterListaPessoas()">Buscar</button>
+            </div>
+        </div>
+
+
+        <div class="conteudo">
+            <div class="d-flex" style="padding: 0 4rem;">
+                <button class="btn-custom d-flex" style="margin: 1rem 0 1rem auto;" onclick="mostrarModalRegistro(0)"><img
+                        src="../../imgs/circle-plus.svg" alt="Registro" class="plus-icon">Registro</button>
+            </div>
+
+            <div class="conteudo-tabela">
+                <!-- Se não tiver nenhum registro essa mensagem será exibida -->
+                <div id="info-row" class="info-row"><img src="../../imgs/circle-info-solid.svg" alt="Buscar" class="search-icon info"> Nenhum registro encontrado no sistema.</div>
+
+                <!-- Caso contrário a tabela será exibida -->
+                <table id="tabela" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th class="icon-column"></th>
+                            <th>Nome</th>
+                            <th class="coluna-contatos">Contatos</th>
+                            <th class="icon-column"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-pessoas">
+                    </tbody>
+                </table>
+                <div id="pagination-container">
+                    <div class="quantidades d-flex">
+                        <p>Total de registros: <span id="total-registro"></span></p>
+                        <p>Total de páginas: <span id="total-pages"></span></p>
+                    </div>
+                    <ul class="pagination" id="pagination">
+                        <li><button onclick="firstPage()" id="first-page"><<</button></li>
+                        <li><button onclick="previousPage()" id="prev-page"><</button></li>
+                        <li id="page-numbers"></li>
+                        <li><button onclick="nextPage()" id="next-page">></button></li>
+                        <li><button onclick="lastPage()" id="last-page">>></button></li>
+                    </ul>
+                </div>
+
+
+            </div>
+
+        </div>
+
+        <div id="confirmModal">
+            <div>
+                <h3 id="titulo-confirm-modal">Tem certeza que deseja <br> excluir esta pessoa?</h3>
+                <div class="d-flex" style="padding: 0 4rem;">
+                    <button id="cancelDelete" class="btn-cancel-custom d-flex">Cancelar</button>
+                    <button id="confirmDelete" class="btn-confirm-custom d-flex">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="confirmModalContato">
+            <div>
+                <h3 id="titulo-confirm-modal-contato">Este contato já existia para essa pessoa, <br> Tem certeza que deseja prosseguir?</h3>
+                <div class="d-flex" style="padding: 0 4rem;">
+                    <button id="cancelDeleteContato" class="btn-cancel-custom d-flex">Cancelar</button>
+                    <button id="confirmDeleteContato" class="btn-confirm-custom d-flex">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorModal">
+            <div>
+                <h3 id="titulo-erro-modal"></h3>
+                <div class="d-flex" style="justify-content: center;">
+                    <button id="accept-btn" class="btn-confirm-custom d-flex">Ok</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="registroModal">
+            <div>
+                <div class="head-modal">
+                    <h2 id="titulo-head-modal"></h2>
+                    <img src="../../imgs/circle-close.svg" alt="Fechar" class="close-icon" onclick="fecharModalRegistro()">
+                </div>
+
+                <div class="card-pessoa">
+                    <h3 style="margin: 0;"><img src="../../imgs/user-solid-bk.svg" alt="Pessoa" class="pessoa-icon">Pessoa</h3>
+                    <div class="d-flex">
+                        <input type="hidden" id="codPessoa" value="0">
+                        <label for="nome" class="lbl-nome">Nome</label>
+                        <div class="nome-input-container">
+                            <input type="text" id="nome-input" class="nome-input" maxlength="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-contatos">
+                    <h3><img src="../../imgs/list-ul-solid.svg" alt="Pessoa" class="pessoa-icon">Contatos</h3>
+                    <button class="btn-custom d-flex add-contato" style="margin: 0px 14px 1rem auto; padding: 6px 12px;" onclick="adicionarContato()"><img
+                        src="../../imgs/circle-plus.svg" alt="Contato" class="plus-icon">Contato</button>
+
+
+                    <div id="contatosContainer" class="contatos-container">
+                        <div class="contato-row">
+
+                            <div class="tipo-contato-select-container">
+                                <label for="tipo-contato" class="lbl-tipo-contato">Tipo de Contato </label>
+                                <select class="tipo-contato" onchange="aplicarMascara(this)">
+                                    <option value="0"></option>
+                                    <option value="1">Telefone</option>
+                                    <option value="2">E-mail</option>
+                                    <option value="3">Whatsapp</option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex" style="padding: 0;">
+                                <label for="descricao" class="lbl-descricao">Descrição </label>
+                                <div class="descricao-input-container">
+                                    <input type="text" class="descricao-input" onblur="validarContato(this)" maxlength="100">
+                                </div>
+                            </div>
+
+                            <button class="delete-contato" onclick="removerContato(this)">
+                                <img src="../../imgs/trash-can-regular.svg" class="icon" style="height: 24px;" alt="Excluir">
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex action-bar">
+                    <button id="cancelarRegistro" class="btn-cancel-custom d-flex" onclick="fecharModalRegistro()">Cancelar</button>
+                    <button id="confirmarRegistro" class="btn-confirm-custom d-flex">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <script src="script.js"></script>
+</body>
+
+</html>
