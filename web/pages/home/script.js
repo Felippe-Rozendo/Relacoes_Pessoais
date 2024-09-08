@@ -1,5 +1,5 @@
 let isSubmitting = false;
-const urlBase = 'http://localhost:5199/'
+const urlBase = 'https://apiazurerelacoespessoais-czdnemf2bwfxegda.brazilsouth-01.azurewebsites.net/'
 
 async function load() {
     await this.obterListaPessoas();
